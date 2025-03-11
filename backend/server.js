@@ -5,7 +5,8 @@ const config = require("./config.json");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-const clientRoutes = require("./routes/clientRoutes/clientPostRoutes");
+const clientPostRoutes = require("./routes/clientRoutes/clientPostRoutes");
+const clientGetRoutes = require("./routes/clientRoutes/clientGetRoutes");
 // const plaidPostRoutes = require("./routes/clientRoutes/plaidPostRoutes");
 
 app.use(
@@ -29,7 +30,8 @@ app.use(
   })
 );
 
-app.use("/", clientRoutes);
+app.use("/client_post", clientPostRoutes);
+app.use("/client_get", clientGetRoutes);
 // app.use("/", plaidPostRoutes);
 
 app.listen(config.PORT, () => {

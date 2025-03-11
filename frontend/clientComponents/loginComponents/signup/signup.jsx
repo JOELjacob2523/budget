@@ -144,7 +144,40 @@ const Signup = () => {
               label="Passowrd"
               rules={[{ required: true, type: "password" }]}
             >
-              <Input prefix={<TbPasswordUser />} placeholder="Password" />
+              <Input.Password
+                prefix={<TbPasswordUser />}
+                placeholder="Password"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="confirm"
+              label="Confirm Password"
+              dependencies={["password"]}
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Please confirm your password!",
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error(
+                        "The new password that you entered do not match!"
+                      )
+                    );
+                  },
+                }),
+              ]}
+            >
+              <Input.Password
+                prefix={<TbPasswordUser />}
+                placeholder="Confirm password"
+              />
             </Form.Item>
           </div>
 

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const { json } = require("body-parser");
 const SECRET_KEY = process.env.SECRET_KEY;
 
-module.exports = { createClient };
+module.exports = { createClient, confirmClient, getClientInfo };
 
 // create user
 async function createClient(
@@ -45,7 +45,7 @@ async function createClient(
     cell2: cell2,
     email: email,
     password_hash: hashedPassword,
-    role: "User",
+    role: "user",
   };
 
   // Create token
@@ -66,6 +66,33 @@ async function createClient(
     email,
     password_hash: hashedPassword,
     token,
-    role: "User",
+    role: "user",
   });
+}
+
+// confirm user
+async function confirmClient(req, email, password) {
+  try {
+    const user = await knex("clients").select().where("email", email).first();
+    if (!user) {
+      throw new Error("Invalid username");
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatch) {
+      throw new Error("Invalid password");
+    }
+
+    const token = jwt.sign({ client_id: user.client_id }, SECRET_KEY);
+    req.session.token = token;
+    req.session.client_id = user.client_id;
+
+    return { user, client_id: user.client_id };
+  } catch (err) {
+    console.error("Error confirming user credentials:", err);
+    throw err;
+  }
+}
+
+async function getClientInfo(id) {
+  return await knex("clients").select().where("client_id", id).first();
 }
